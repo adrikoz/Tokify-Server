@@ -1,0 +1,150 @@
+org: adrikoz
+app: tokify
+service: 
+  name: Tokify
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-pseudo-parameters
+
+custom:
+  region: eu-west-2
+  userTable: user
+  requestsTable: contract-generator-requests
+  connectionsTable: websocket-connections
+  tableThroughputs:
+    dev: "20"
+    beta: "20"
+    prod: "20"
+  customProviderName: my.ether.login
+  templateContractBucketName: template-contracts
+  generatedContractBucketName: generated-contracts
+  compiledContractBucketName: compiled-contracts
+
+provider:
+  stage: dev
+  region: eu-west-2
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: '20201221'
+  environment:
+    DEVELOPER_PROVIDER_NAME: ${self:custom.customProviderName}
+    USERTABLE_NAME: ${self:custom.userTable}
+    REQUESTS_TABLE: ${self:custom.requestsTable}
+    CONNECTIONS_TABLE: ${self:custom.connectionsTable}
+    IDENTITY_POOL_ID: { Ref: CognitoIdentityPool }
+    TEMPLATE_CONTRACT_BUCKET_NAME: ${self:custom.templateContractBucketName}
+    GENERATED_CONTRACT_BUCKET_NAME: ${self:custom.generatedContractBucketName}
+    COMPILED_CONTRACT_BUCKET_NAME: ${self:custom.compiledContractBucketName}
+    API_REGION: ${self:custom.region}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:ExecuteStatement"
+        - "dynamodb:PartiQLSelect"
+      Resource:
+        - "Fn::GetAtt": [UserTable, Arn]
+        - "Fn::Join":
+            - "/"
+            - - { "Fn::GetAtt": [UserTable, Arn] }
+              - "index/*"
+    - Effect: "Allow"
+      Action:
+        - "cognito-identity:GetCredentialsForIdentity"
+        - "cognito-identity:GetOpenIdTokenForDeveloperIdentity"
+      Resource:
+        - "Fn::Join":
+            - "/"
+            - - "arn:aws:cognito-identity:#{AWS::Region}:#{AWS::AccountId}:identitypool"
+              - Ref: CognitoIdentityPool
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource:
+        - Fn::GetAtt: [ConnectionsTable, Arn]
+        - Fn::Join:
+            - '/'
+            - - Fn::GetAtt: [ConnectionsTable, Arn]
+              - '*'
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource: "arn:aws:dynamodb:eu-west-2:288605598865:table/contract-generator-requests"
+    -  Effect: "Allow"
+       Action:
+         - "s3:Put*"
+         - "s3:Get*"
+       Resource: "arn:aws:s3:::${self:custom.templateContractBucketName}/*"
+    -  Effect: "Allow"
+       Action:
+         - "s3:Put*"
+         - "s3:Get*"
+       Resource: "arn:aws:s3:::${self:custom.generatedContractBucketName}/*"
+    -  Effect: "Allow"
+       Action:
+         - "s3:Put*"
+         - "s3:Get*"
+       Resource: "arn:aws:s3:::${self:custom.compiledContractBucketName}/*"
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource: "arn:aws:sns:eu-west-2:288605598865:*"
+
+functions:
+  ConnectWebsocket: ${file(resources/functions.yml):ConnectWebsocket}
+  DefaultWebsocket: ${file(resources/functions.yml):DefaultWebsocket}
+  Login: ${file(resources/functions.yml):Login}
+  GetNonce: ${file(resources/functions.yml):GetNonce}
+  Signup: ${file(resources/functions.yml):Signup}
+  Hello: ${file(resources/functions.yml):Hello}
+  ContractGeneratorRequest: ${file(resources/functions.yml):ContractGeneratorRequest}
+  CompileContract: ${file(resources/functions.yml):CompileContract}
+  DynamoTriggeredCreate: ${file(resources/functions.yml):DynamoTriggeredCreate}
+  RetrieveBytecode: ${file(resources/functions.yml):RetrieveBytecode}
+  MarkTxHash: ${file(resources/functions.yml):MarkTxHash}
+  RetrieveUserContracts: ${file(resources/functions.yml):RetrieveUserContracts}
+
+resources:
+  Resources:
+    RequestTable: ${file(resources/tables.yml):RequestTable}
+    UserTable: ${file(resources/tables.yml):UserTable}
+    ConnectionsTable: ${file(resources/tables.yml):ConnectionsTable}
+    CognitoIdentityPool: ${file(resources/cognito.yml):CognitoIdentityPool}
+    CognitoAuthorizedRole: ${file(resources/cognito.yml):CognitoAuthorizedRole}
+    CognitoUnAuthorizedRole: ${file(resources/cognito.yml):CognitoUnAuthorizedRole}
+    CognitoIdentityPoolRolesMapping: ${file(resources/cognito.yml):CognitoIdentityPoolRolesMapping}
+    TemplateBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.templateContractBucketName}
+    GeneratedBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.generatedContractBucketName}
+    CompiledBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.compiledContractBucketName}
+    
