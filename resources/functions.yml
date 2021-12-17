@@ -61,7 +61,7 @@ DynamoTriggeredCreate:
   maximumEventAge: 60
   maximumRetryAttempts: 0
   events:
-    - stream: arn:aws:dynamodb:eu-west-2:288605598865:table/prod-contract-generator-requests/stream/2021-12-17T18:46:35.183
+    - stream: arn:aws:dynamodb:eu-west-2:288605598865:table/prod-contract-generator-requests/stream/2021-12-17T19:12:26.719
       maximumRetryAttempts: 0
 
 RetrieveBytecode:
