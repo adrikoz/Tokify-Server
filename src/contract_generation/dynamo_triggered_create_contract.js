@@ -126,7 +126,7 @@ module.exports.handler = (event, context) => {
 async function publishSnsTopic (message) {
     const params = {
       Message: message,
-      TopicArn: `arn:aws:sns:eu-west-2:288605598865:compile`
+      TopicArn: `arn:aws:sns:${process.env.API_REGION}:288605598865:${process.env.STACK_STAGE}-compile`
     }
     return sns.publish(params).promise()
 }

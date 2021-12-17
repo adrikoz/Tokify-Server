@@ -54,14 +54,14 @@ CompileContract:
   handler: src/contract_generation/compiler.handler
   timeout: 45
   events:
-    - sns: compile
+    - sns: ${self:provider.stage}-compile
 
 DynamoTriggeredCreate:
   handler: src/contract_generation/dynamo_triggered_create_contract.handler
   maximumEventAge: 60
   maximumRetryAttempts: 0
   events:
-    - stream: arn:aws:dynamodb:eu-west-2:288605598865:table/contract-generator-requests/stream/2021-12-07T11:59:37.454
+    - stream: arn:aws:dynamodb:eu-west-2:288605598865:table/prod-contract-generator-requests/stream/2021-12-17T16:38:15.356
       maximumRetryAttempts: 0
 
 RetrieveBytecode:

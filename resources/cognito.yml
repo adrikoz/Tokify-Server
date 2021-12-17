@@ -44,7 +44,7 @@ CognitoAuthorizedRole:
               Action:
                 - "execute-api:Invoke"
               Resource: 
-                "Fn::Sub": "arn:aws:execute-api:#{AWS::Region}:#{AWS::AccountId}:*/*/GET/hello"
+                "Fn::Sub": "arn:aws:execute-api:${aws:region}:${aws:accountId}:*/*/GET/hello"
 
 CognitoUnAuthorizedRole:
     Type: AWS::IAM::Role

@@ -5,25 +5,22 @@ service:
 
 frameworkVersion: '2'
 
-plugins:
-  - serverless-pseudo-parameters
-
 custom:
   region: eu-west-2
-  userTable: user
-  requestsTable: contract-generator-requests
-  connectionsTable: websocket-connections
+  userTable: ${self:provider.stage}-user
+  requestsTable: ${self:provider.stage}-contract-generator-requests
+  connectionsTable: ${self:provider.stage}-websocket-connections
   tableThroughputs:
     dev: "20"
     beta: "20"
     prod: "20"
   customProviderName: my.ether.login
-  templateContractBucketName: template-contracts
-  generatedContractBucketName: generated-contracts
-  compiledContractBucketName: compiled-contracts
+  templateContractBucketName: ${self:provider.stage}-template-contracts
+  generatedContractBucketName: ${self:provider.stage}-generated-contracts
+  compiledContractBucketName: ${self:provider.stage}-compiled-contracts
 
 provider:
-  stage: dev
+  stage: prod
   region: eu-west-2
   name: aws
   runtime: nodejs12.x
@@ -38,6 +35,7 @@ provider:
     GENERATED_CONTRACT_BUCKET_NAME: ${self:custom.generatedContractBucketName}
     COMPILED_CONTRACT_BUCKET_NAME: ${self:custom.compiledContractBucketName}
     API_REGION: ${self:custom.region}
+    STACK_STAGE: ${self:provider.stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -59,7 +57,7 @@ provider:
       Resource:
         - "Fn::Join":
             - "/"
-            - - "arn:aws:cognito-identity:#{AWS::Region}:#{AWS::AccountId}:identitypool"
+            - - "arn:aws:cognito-identity:${aws:region}:${aws:accountId}:identitypool"
               - Ref: CognitoIdentityPool
     - Effect: Allow
       Action:
@@ -91,7 +89,12 @@ provider:
         - dynamodb:GetRecords
         - dynamodb:GetShardIterator
         - dynamodb:ListStreams
-      Resource: "arn:aws:dynamodb:eu-west-2:288605598865:table/contract-generator-requests"
+      Resource:
+        - Fn::GetAtt: [RequestTable, Arn]
+        - Fn::Join:
+            - '/'
+            - - Fn::GetAtt: [RequestTable, Arn]
+              - '*'
     -  Effect: "Allow"
        Action:
          - "s3:Put*"

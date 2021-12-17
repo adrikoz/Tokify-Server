@@ -1,7 +1,7 @@
 UserTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: ${self:custom.userTable}
+    TableName: ${self:provider.stage}-${self:custom.userTable}
     SSESpecification:
       SSEEnabled: true
     AttributeDefinitions:
@@ -19,7 +19,7 @@ UserTable:
 RequestTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: ${self:custom.requestsTable}
+    TableName: ${self:provider.stage}-${self:custom.requestsTable}
     SSESpecification:
       SSEEnabled: true
     AttributeDefinitions:
@@ -37,7 +37,7 @@ RequestTable:
 ConnectionsTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: ${self:custom.connectionsTable}
+    TableName: ${self:provider.stage}-${self:custom.connectionsTable}
     AttributeDefinitions:
       - AttributeName: pk
         AttributeType: S
