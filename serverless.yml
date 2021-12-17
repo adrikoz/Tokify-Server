@@ -20,7 +20,7 @@ custom:
   compiledContractBucketName: ${self:provider.stage}-compiled-contracts
 
 provider:
-  stage: prod
+  stage: dev
   region: eu-west-2
   name: aws
   runtime: nodejs12.x
