@@ -12,12 +12,14 @@ custom:
   connectionsTable: ${self:provider.stage}-websocket-connections
   tableThroughputs:
     dev: "20"
-    beta: "20"
     prod: "20"
   customProviderName: my.ether.login
   templateContractBucketName: ${self:provider.stage}-template-contracts
   generatedContractBucketName: ${self:provider.stage}-generated-contracts
   compiledContractBucketName: ${self:provider.stage}-compiled-contracts
+  contractGeneratedStream:
+    dev: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/dev-contract-generator-requests/stream/2021-12-17T18:40:15.064
+    prod: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/prod-contract-generator-requests/stream/2021-12-17T19:12:26.719
 
 provider:
   stage: dev
