@@ -54,8 +54,7 @@ const getCredentials = (identityId, cognitoOpenIdToken) => {
 };
 
 const validateSig = async (address, signature, nonce) => {
-  const message = `nonce: ${nonce}`;
-  const hash = 'Welcome to Tokify, please sign this request to sign into your Tokify account. This is used to deploy tokens and to view your created projects.\n\n\n' + web3.utils.sha3(message);
+  const hash = 'Welcome to Tokify!\n\nSigning this message links your wallet address to all the tokens you create through Tokify. This ensures that only you are the owner.\n\nTokify does not get access to any other data besides your publicly available wallet address.\n\n' + web3.utils.sha3(nonce);
   const signing_address = await web3.eth.accounts.recover(hash, signature);
   return signing_address.toLowerCase() === address.toLowerCase();
 };
