@@ -64,7 +64,7 @@ class Client {
                         requestContext: {
                             domainName: config.requestContext.domainName,
                             stage: config.requestContext.stage
-                        }
+                        },
                     }
                 }).promise();
             }
@@ -104,8 +104,8 @@ class Client {
                     db.Client.delete({
                         TableName: db.Table,
                         Key: {
-                            [db.Request.Connections.Key]: `${db.Request.Prefix}${db.parseEntityId(subscription[db.Request.Primary.Key])}`,
-                            [db.Request.Connections.Range]: `${db.Connection.Prefix}${ConnectionId}`
+                            [db.ContractRequest.Connections.Key]: `${db.ContractRequest.Prefix}${db.parseEntityId(subscription[db.ContractRequest.Primary.Key])}`,
+                            [db.ContractRequest.Connections.Range]: `${db.Connection.Prefix}${ConnectionId}`
                         }
                     }).promise()
                 );
