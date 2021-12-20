@@ -12,7 +12,7 @@ const db = {
             Key: 'pk',
             Range: 'sk'
         },
-        Contracts: {
+        ContractRequests: {
             Index: 'reverse',
             Key: 'sk',
             Range: 'pk'
@@ -20,7 +20,7 @@ const db = {
         Prefix: 'CONNECTION|',
         Entity: 'CONNECTION'
     },
-    Request: {
+    ContractRequest: {
         Primary: {
             Key: 'pk',
             Range: 'sk'
@@ -29,12 +29,12 @@ const db = {
             Key: 'pk',
             Range: 'sk'
         },
-        Prefix: 'REQUEST|',
-        Entity: 'REQUEST'
+        Prefix: 'CONTRACTREQUEST|',
+        Entity: 'CONTRACTREQUEST'
     },
 }
 
-const requestRegex = new RegExp(`^${db.Request.Entity}\|`);
+const requestRegex = new RegExp(`^${db.ContractRequest.Entity}\|`);
 const connectionRegex = new RegExp(`^${db.Connection.Entity}\|`);
 
 function parseEntityId(target){
@@ -54,46 +54,51 @@ function parseEntityId(target){
 }
 
 async function fetchConnectionSubscriptions(connection){
+    console.log('fetching subscriptions: ', JSON.stringify(connection));
     const connectionId = parseEntityId(connection)
-    if (db.Connection.Requests){
+    console.log('connectionId: ', connectionId);
+    if (db.Connection.ContractRequests){
         const results = await ddb.query({
             TableName: db.Table,
-            IndexName: db.Connection.Requests.Index,
+            IndexName: db.Connection.ContractRequests.Index,
             KeyConditionExpression: `${
-            db.Connection.Requests.Key
+            db.Connection.ContractRequests.Key
             } = :connectionId and begins_with(${
-            db.Connection.Requests.Range
+            db.Connection.ContractRequests.Range
             }, :requestEntity)`,
             ExpressionAttributeValues: {
             ":connectionId": `${db.Connection.Prefix}${
                 connectionId
             }`,
-            ":requestEntity": db.Request.Prefix
+            ":requestEntity": db.ContractRequest.Prefix
             }
         }).promise();
-
+        console.log('items: ', JSON.stringify(results.Items));
         return results.Items;
     } else {
+        console.log('no items found');
         return [];
     }
 }
 
-async function fetchRequestSubscriptions(request){
-    const requestId = parseEntityId(request)
+async function fetchContractRequestSubscriptions(request){
+    console.log('fetching subscriptions: ', JSON.stringify(request));
+    const requestId = parseEntityId(request);
+    console.log('requestId: ', requestId);
     const results = await ddb.query({
         TableName: db.Table,
         KeyConditionExpression: `${
-          db.Request.Connections.Key
+          db.ContractRequest.Connections.Key
         } = :requestId and begins_with(${
-          db.Request.Connections.Range
+          db.ContractRequest.Connections.Range
         }, :connectionEntity)`,
         ExpressionAttributeValues: {
-          ":requestId": `${db.Request.Prefix}${requestId}`,
+          ":requestId": `${db.ContractRequest.Prefix}${requestId}`,
           ":connectionEntity": db.Connection.Prefix
         }
-      }).promise();
+    }).promise();
 
-      return results.Items;
+    return results.Items;
 }
 
 
@@ -101,7 +106,7 @@ const client = {
     ...db,
     parseEntityId,
     fetchConnectionSubscriptions,
-    fetchRequestSubscriptions,
+    fetchContractRequestSubscriptions,
     Client: ddb
 }
 

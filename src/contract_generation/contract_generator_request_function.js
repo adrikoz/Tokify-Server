@@ -32,10 +32,11 @@ module.exports.handler = async (event, context) => {
             await db.Client.put({
             TableName: db.Table,
             Item: {
-                [db.Request.Connections.Key]: `${db.Request.Prefix}${id}`,
-                [db.Request.Connections.Range]: `${db.Connection.Prefix}${
+                [db.ContractRequest.Connections.Key]: `${db.ContractRequest.Prefix}${id}`,
+                [db.ContractRequest.Connections.Range]: `${db.Connection.Prefix}${
                 db.parseEntityId(event)
-                }`
+                }`,
+                ttl: parseInt((Date.now() / 1000) + 600)
             }
             }).promise();
         } catch(err) {
@@ -87,11 +88,11 @@ module.exports.handler = async (event, context) => {
             }
         }).promise();
         try {
-        const subscribers = await db.fetchRequestSubscriptions(id);
+        const subscribers = await db.fetchContractRequestSubscriptions(id);
         console.log('subscribers: ', JSON.stringify(subscribers));
         const results = subscribers.map(subscriber => {
             const subscriberId = db.parseEntityId(
-                subscriber[db.Request.Connections.Range]
+                subscriber[db.ContractRequest.Connections.Range]
             );
             console.log('subscriber: ', subscriber);
             try {
