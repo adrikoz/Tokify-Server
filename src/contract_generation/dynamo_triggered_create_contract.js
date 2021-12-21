@@ -78,11 +78,11 @@ module.exports.handler = (event, context) => {
                             };
                             const upload_data = await s3.upload(upload_params).promise();
                             console.log('upload data:', JSON.stringify(upload_data));
-                            const subscribers = await db.fetchRequestSubscriptions(id);
+                            const subscribers = await db.fetchContractRequestSubscriptions(id);
                             console.log('subscribers: ', JSON.stringify(subscribers));
                             const results = subscribers.map(subscriber => {
                                 const subscriberId = db.parseEntityId(
-                                    subscriber[db.Request.Connections.Range]
+                                    subscriber[db.ContractRequest.Connections.Range]
                                 );
                                 console.log('subscriber: ', subscriber);
                                 try {

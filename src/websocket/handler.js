@@ -13,13 +13,14 @@ async function connection_manager(event, context) {
   await wsClient._setupClient(event);
 
   if (event.requestContext.eventType === "CONNECT") {
+    console.log('connect request');
     // sub general request
     await subscribe_request(
       {
         ...event,
         body: JSON.stringify({
           action: "subscribe",
-          requestId: ""
+          contractRequestId: ""
         })
       },
       context
@@ -27,6 +28,7 @@ async function connection_manager(event, context) {
 
     return success;
   } else if (event.requestContext.eventType === "DISCONNECT") {
+    console.log('disconnect request');
     // unsub all requests connection was in
     const subscriptions = await db.fetchConnectionSubscriptions(event);
     const unsubscribes = subscriptions.map(async subscription =>
@@ -36,7 +38,7 @@ async function connection_manager(event, context) {
           ...event,
           body: JSON.stringify({
             action: "unsubscribe",
-            requestId: db.parseEntityId(subscription[db.Request.Primary.Key])
+            contractRequestId: db.parseEntityId(subscription[db.ContractRequest.Primary.Key])
           })
         },
         context
@@ -74,14 +76,15 @@ async function request_manager(event, context) {
   }
   
   async function subscribe_request(event, context) {
-    const requestId = JSON.parse(event.body).requestId;
+    const contractRequestId = JSON.parse(event.body).contractRequestId;
     await db.Client.put({
       TableName: db.Table,
       Item: {
-        [db.Request.Connections.Key]: `${db.Request.Prefix}${requestId}`,
-        [db.Request.Connections.Range]: `${db.Connection.Prefix}${
+        [db.ContractRequest.Connections.Key]: `${db.ContractRequest.Prefix}${contractRequestId}`,
+        [db.ContractRequest.Connections.Range]: `${db.Connection.Prefix}${
           db.parseEntityId(event)
-        }`
+        }`,
+        ttl: parseInt((Date.now() / 1000) + 600)
       }
     }).promise();
   
@@ -93,12 +96,13 @@ async function request_manager(event, context) {
   }
   
   async function unsubscribe_request(event, context) {
-    const requestId = JSON.parse(event.body).requestId;
+    console.log('unsubsribe request: ', JSON.stringify(event));
+    const contractRequestId = JSON.parse(event.body).contractRequestId;
     const item = await db.Client.delete({
       TableName: db.Table,
       Key: {
-        [db.Request.Connections.Key]: `${db.Request.Prefix}${requestId}`,
-        [db.Request.Connections.Range]: `${db.Connection.Prefix}${
+        [db.ContractRequest.Connections.Key]: `${db.ContractRequest.Prefix}${contractRequestId}`,
+        [db.ContractRequest.Connections.Range]: `${db.Connection.Prefix}${
           db.parseEntityId(event)
         }`
       }
