@@ -23,7 +23,7 @@ custom:
     prod: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/prod-contract-generator-requests/stream/2021-12-17T19:12:26.719
 
 provider:
-  stage: dev
+  stage: dev-api-authorization
   region: eu-west-2
   name: aws
   runtime: nodejs12.x
