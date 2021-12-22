@@ -2,6 +2,7 @@ org: adrikoz
 app: tokify
 service: 
   name: Tokify
+variablesResolutionMode: 20210326
 
 frameworkVersion: '2'
 
@@ -14,6 +15,7 @@ custom:
   tableThroughputs:
     dev: "20"
     prod: "20"
+    dev-api-authorization: "20"
   customProviderName: my.ether.login
   templateContractBucketName: ${self:provider.stage}-template-contracts
   generatedContractBucketName: ${self:provider.stage}-generated-contracts
@@ -118,7 +120,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "sns:*"
-      Resource: "arn:aws:sns:eu-west-2:288605598865:*"
+      Resource: "arn:aws:sns:eu-west-2:${aws:accountId}:*"
 
 functions:
   ConnectWebsocket: ${file(resources/functions.yml):ConnectWebsocket}

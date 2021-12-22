@@ -60,9 +60,9 @@ DynamoTriggeredCreate:
   handler: src/contract_generation/dynamo_triggered_create_contract.handler
   maximumEventAge: 60
   maximumRetryAttempts: 0
-  events:
-    - stream: ${self:custom.contractGeneratedStream.${self:provider.stage}}
-      maximumRetryAttempts: 0
+  # events:
+    # - stream: ${self:custom.contractGeneratedStream.${self:provider.stage}}
+      # maximumRetryAttempts: 0
 
 RetrieveBytecode:
   handler: src/contract_retrieval/bytecode_link.handler
