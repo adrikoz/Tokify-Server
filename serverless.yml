@@ -23,6 +23,7 @@ custom:
   contractGeneratedStream:
     dev: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/dev-contract-generator-requests/stream/2021-12-17T18:40:15.064
     prod: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/prod-contract-generator-requests/stream/2021-12-17T19:12:26.719
+    dev-api-authorization: arn:aws:dynamodb:eu-west-2:288605598865:table/dev-api-authorization-contract-generator-requests/stream/2021-12-22T20:42:12.093
 
 provider:
   stage: dev-api-authorization
