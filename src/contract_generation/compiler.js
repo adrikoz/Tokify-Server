@@ -93,7 +93,7 @@ module.exports.handler = async (event) => {
         console.log("point 3");
         var contractSelector = '';
         if (type === "Liquidity Generator") {
-            contractSelector = 'LiquidityGeneratorToken';
+            contractSelector = 'CustomToken';
         } else {
             contractSelector = 'StandardToken';
         }

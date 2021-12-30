@@ -60,7 +60,10 @@ module.exports.handler = async (event, context) => {
             router: requestJSON.router,
             transactionYield: parseInt(requestJSON.transaction_yield, 10),
             transactionLiquidity: parseInt(requestJSON.transaction_liquidity, 10),
-            maxTransactionAmount: parseInt(requestJSON.max_transaction_amount, 10) * 10 ** decimals
+            maxTransactionAmount: parseInt(requestJSON.max_transaction_amount, 10) * 10 ** decimals,
+            marketingWallet: requestJSON.marketing_wallet,
+            marketingFee: parseInt(requestJSON.marketing_fee, 10),
+            minLiquidityTransactionVolume: parseInt(requestJSON.min_liquidity_transaction_volume) * 10 ** decimals
           };
           parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
             Object.keys(o).forEach(function (k) { r[k] = o[k]; });
