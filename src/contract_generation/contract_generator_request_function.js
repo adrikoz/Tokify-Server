@@ -47,11 +47,13 @@ module.exports.handler = async (event, context) => {
         var totalSupply = parseInt(requestJSON.total_supply, 10) * 10 ** decimals;
 
         let parametersMap = {
-          tokenName: requestJSON.token_name,
-          tokenSymbol: requestJSON.token_symbol,
-          decimals: decimals,
-          totalSupply: totalSupply,
-          selectedFunctions: requestJSON.selected_function,
+            tokenName: requestJSON.token_name,
+            tokenSymbol: requestJSON.token_symbol,
+            decimals: decimals,
+            totalSupply: totalSupply,
+            selectedFunctions: requestJSON.selected_function,
+            marketingWallet: requestJSON.marketing_wallet,
+            marketingFee: parseInt(requestJSON.marketing_fee, 10),
         };
         console.log("parameters 1")
         
@@ -61,8 +63,6 @@ module.exports.handler = async (event, context) => {
             transactionYield: parseInt(requestJSON.transaction_yield, 10),
             transactionLiquidity: parseInt(requestJSON.transaction_liquidity, 10),
             maxTransactionAmount: parseInt(requestJSON.max_transaction_amount, 10) * 10 ** decimals,
-            marketingWallet: requestJSON.marketing_wallet,
-            marketingFee: parseInt(requestJSON.marketing_fee, 10),
             minLiquidityTransactionVolume: parseInt(requestJSON.min_liquidity_transaction_volume) * 10 ** decimals
           };
           parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
