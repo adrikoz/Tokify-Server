@@ -47,8 +47,8 @@ module.exports.handler = (event, context) => {
                             content.splice(639, 0, `    string private _name = \"${params["tokenName"]["S"]}\";`);
                             content.splice(640, 0, `    string private _symbol = \"${params["tokenSymbol"]["S"]}\";`);
                             content.splice(641, 0, `    uint8 private _decimals = ${params["decimals"]["N"]};`);
-                            content.splice(643, 0, `    uint256 public _taxFee = ${params["transactionYield"]["N"]};`);
-                            content.splice(646, 0, `    uint256 public _liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                            content.splice(642, 0, `    uint256 public _taxFee = ${params["transactionYield"]["N"]};`);
+                            content.splice(645, 0, `    uint256 public _liquidityFee = ${params["transactionLiquidity"]["N"]};`);
                             content.splice(655, 0, `    uint256 public _maxTxAmount = ${params["maxTransactionAmount"]["N"]};`);
                             content.splice(656, 0, `    uint256 private numTokensSellToAddToLiquidity = ${params["minLiquidityTransactionVolume"]["N"]};`);
                             content.splice(658, 0, `    uint256 _protocolFee = ${params["marketingFee"]["N"]}; //USAGE FEE FACTOR (For DEV) - ${params["marketingFee"]["N"]}%`);
