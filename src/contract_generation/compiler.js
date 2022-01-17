@@ -26,8 +26,8 @@ module.exports.handler = async (event) => {
     const message = JSON.parse(event['Records'][0]['Sns']['Message']);
     const id = message['id'];
     const chain = message['chain'];
-    const solidityVersion = message['solidityVersion'];
     const type = message['type'];
+    const name = message['name'];
     try {
         console.log(GENERATED_BUCKET_NAME);
         const Bucket = GENERATED_BUCKET_NAME;
@@ -77,6 +77,8 @@ module.exports.handler = async (event) => {
         var contractSelector = '';
         if (type === "Liquidity Generator") {
             contractSelector = 'LiquidityGenerator';
+        } else if (type === "Rewards") {
+            contractSelector = name;
         } else {
             contractSelector = 'StandardToken';
         }

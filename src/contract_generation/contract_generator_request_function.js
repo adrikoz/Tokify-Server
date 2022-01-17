@@ -53,22 +53,50 @@ module.exports.handler = async (event, context) => {
             totalSupply: totalSupply,
             selectedFunctions: requestJSON.selected_function,
             marketingWallet: requestJSON.marketing_wallet,
-            marketingFee: parseInt(requestJSON.marketing_fee, 10),
         };
         console.log("parameters 1")
         
         if(requestJSON.selected_function === "Liquidity Generator") {
-          let liqGenParametersMap = {
-            router: requestJSON.router,
-            transactionYield: parseInt(requestJSON.transaction_yield, 10),
-            transactionLiquidity: parseInt(requestJSON.transaction_liquidity, 10),
-            maxTransactionAmount: parseInt(requestJSON.max_transaction_amount, 10) * 10 ** decimals,
-            minLiquidityTransactionVolume: parseInt(requestJSON.min_liquidity_transaction_volume) * 10 ** decimals
-          };
-          parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
-            Object.keys(o).forEach(function (k) { r[k] = o[k]; });
-            return r;
-          }, {});
+            let liqGenParametersMap = {
+                marketingFee: parseInt(requestJSON.marketing_fee, 10),
+                router: requestJSON.router,
+                transactionYield: parseInt(requestJSON.transaction_yield, 10),
+                transactionLiquidity: parseInt(requestJSON.transaction_liquidity, 10),
+                maxTransactionAmount: parseInt(requestJSON.max_transaction_amount, 10) * 10 ** decimals,
+                minLiquidityTransactionVolume: parseInt(requestJSON.min_liquidity_transaction_volume) * 10 ** decimals
+            };
+            parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
+        } 
+
+        if(requestJSON.selected_function === "Standard") {
+            let standardParametersMap = {
+                marketingFee: parseInt(requestJSON.marketing_fee, 10),
+            };
+            parametersMap = [parametersMap, standardParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
+        } 
+
+        if(requestJSON.selected_function === "Rewards") {
+            let rewardsParametersMap = {
+                marketingFee: parseInt(parseFloat(requestJSON.marketing_fee) * 100, 10),
+                router: requestJSON.router,
+                routerBaseToken: requestJSON.router_base_token,
+                transactionYield: parseInt(parseFloat(requestJSON.transaction_yield) * 100, 10),
+                transactionLiquidity: parseInt(parseFloat(requestJSON.transaction_liquidity) * 100, 10),
+                rewardsOther: parseInt(parseFloat(requestJSON.rewards_other) * 100, 10),
+                rewardsOtherToken: requestJSON.rewards_other_token,
+                sellMultiplier: parseInt(parseFloat(requestJSON.sell_multiplier) * 10000, 10),
+                buyMultiplier: parseInt(parseFloat(requestJSON.buy_multiplier) * 10000, 10),
+            };
+                parametersMap = [parametersMap, rewardsParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
         } 
 
         console.log("parameters 2")

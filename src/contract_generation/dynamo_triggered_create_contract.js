@@ -35,9 +35,7 @@ module.exports.handler = (event, context) => {
                         console.log(TEMPLATE_BUCKET_NAME);
                         const Bucket = TEMPLATE_BUCKET_NAME;
                         var text = "";
-                        var solidityVersion = "latest";
                         if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator"){
-                            solidityVersion = "v0.8.0+commit.c7dfd78e";
                             const Key = 'liquidity_generator_mw.sol';
                             console.log("point 1");
                             const data = await s3.getObject({ Bucket, Key }).promise();
@@ -56,8 +54,33 @@ module.exports.handler = (event, context) => {
                             content.splice(682, 0, `       IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(${params["router"]["S"]});`)
                             text = content.join("\n");
                             console.log("text: ", text);
+                        } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rewards") {
+                            const Key = 'lg_rn_ro_mw.sol';
+                            console.log("point 1");
+                            const data = await s3.getObject({ Bucket, Key }).promise();
+                            console.log("safemoon: ", JSON.stringify(data));
+                            const content = data.Body.toString('ascii').split("\n");
+                            content.splice(319, 0, `    IBEP20 BUSD = IBEP20(${params["rewardsOtherToken"]["S"]});`);
+                            content.splice(320, 0, `    address WBNB = ${params["routerBaseToken"]["S"]};`);
+                            content.splice(355, 0, `            : IDEXRouter(${params["router"]["S"]});`);
+                            content.splice(515, 0, `contract ${params["tokenName"]["S"]} is IBEP20, Auth {`);
+                            content.splice(519, 0, `    address BUSD = ${params["rewardsOtherToken"]["S"]};`);
+                            content.splice(520, 0, `    address public WBNB = ${params["routerBaseToken"]["S"]};`);
+                            content.splice(525, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                            content.splice(526, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                            content.splice(527, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                            content.splice(530, 0, `    uint256 private _tTotal = ${params["totalSupply"]["N"]};`);
+                            content.splice(545, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                            content.splice(546, 0, `    uint256 rewardFee = ${params["rewardsOther"]["N"]};`);
+                            content.splice(547, 0, `    uint256 rewardNativeFee = ${params["transactionYield"]["N"]};`);
+                            content.splice(548, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
+                            content.splice(558, 0, `    uint256 buyMultiplier = ${params["buyMultiplier"]["N"]};`);
+                            content.splice(559, 0, `    uint256 sellMultiplier = ${params["sellMultiplier"]["N"]};`);
+                            content.splice(562, 0, `    address public marketingFeeReceiver = ${params["marketingWallet"]["S"]};`);
+                            content.splice(589, 0, `        address _dexRouter = ${params["router"]["S"]};`);
+                            text = content.join("\n");
+                            console.log("text: ", text);
                         } else {
-                            solidityVersion = 'v0.8.0+commit.c7dfd78e';
                             const Key = 'standard_mw.sol';
                             console.log("point 1");
                             const data = await s3.getObject({ Bucket, Key }).promise();
@@ -103,8 +126,8 @@ module.exports.handler = (event, context) => {
                             const message = JSON.stringify({
                                 'id': id,
                                 'chain': chain,
-                                'solidityVersion': solidityVersion,
-                                'type': record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S']
+                                'type': record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'],
+                                'name': params["tokenName"]["S"]
                             });
                             const metadata = await publishSnsTopic(message).promise();
                             console.log('metadata: ', JSON.stringify(metadata));
