@@ -99,6 +99,22 @@ module.exports.handler = async (event, context) => {
             }, {});
         } 
 
+        if(requestJSON.selected_function === "Rising Floor") {
+            let risingFloorParametersMap = {
+                marketingFee: parseInt(parseFloat(requestJSON.marketing_fee) * 100, 10),
+                router: requestJSON.router,
+                routerBaseToken: requestJSON.router_base_token,
+                transactionLiquidity: parseInt(parseFloat(requestJSON.transaction_liquidity) * 100, 10),
+                rewardsBase: parseInt(parseFloat(requestJSON.rewards_base) * 100, 10),
+                sellMultiplier: parseInt(parseFloat(requestJSON.sell_multiplier) * 10000, 10),
+                buyMultiplier: parseInt(parseFloat(requestJSON.buy_multiplier) * 10000, 10),
+            };
+                parametersMap = [parametersMap, risingFloorParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
+        } 
+
         console.log("parameters 2")
         
         await dynamo.put({
