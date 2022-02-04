@@ -27,7 +27,7 @@ module.exports.handler = async (event) => {
     const id = message['id'];
     const chain = message['chain'];
     const type = message['type'];
-    const name = message['name'];
+    const name = message['name'].replace(/\s/g, '');
     try {
         console.log(GENERATED_BUCKET_NAME);
         const Bucket = GENERATED_BUCKET_NAME;
@@ -77,11 +77,12 @@ module.exports.handler = async (event) => {
         var contractSelector = '';
         if (type === "Liquidity Generator") {
             contractSelector = 'LiquidityGenerator';
-        } else if (type === "Rewards") {
+        } else if (type === "Rewards" || type === "Rising Floor") {
             contractSelector = name;
         } else {
             contractSelector = 'StandardToken';
         }
+        console.log('object: ', JSON.stringify(output.contracts['contract.sol']));
         console.log('bytecode: ', output.contracts['contract.sol'][contractSelector].evm.bytecode.object);
         console.log('abi: ', output.contracts['contract.sol'][contractSelector].abi);
         try {

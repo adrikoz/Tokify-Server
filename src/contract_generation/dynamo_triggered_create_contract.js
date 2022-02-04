@@ -28,33 +28,60 @@ module.exports.handler = (event, context) => {
             if (record.eventName == 'INSERT' || record['dynamodb']['OldImage']['timestamp']['S'] !== record['dynamodb']['NewImage']['timestamp']['S']) {
                 try {
 
-                    
-                        const id = record['dynamodb']['NewImage']['id']['S'];
-                        const chain = record['dynamodb']['NewImage']['chain']['S']
-                        const params = record['dynamodb']['NewImage']['parameters']['M'];
-                        console.log(TEMPLATE_BUCKET_NAME);
-                        const Bucket = TEMPLATE_BUCKET_NAME;
-                        var text = "";
-                        if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator"){
-                            const Key = 'liquidity_generator_mw.sol';
+                        
+                    const id = record['dynamodb']['NewImage']['id']['S'];
+                    const chain = record['dynamodb']['NewImage']['chain']['S']
+                    const params = record['dynamodb']['NewImage']['parameters']['M'];
+                    const nameNoSpace = params["tokenName"]["S"].replace(/\s/g, '');
+                    console.log(TEMPLATE_BUCKET_NAME);
+                    const Bucket = TEMPLATE_BUCKET_NAME;
+                    var text = "";
+                    if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator"){
+                        const Key = 'liquidity_generator_mw.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(634, 0, `    uint256 private _tTotal = ${params["totalSupply"]["N"]};`);
+                        content.splice(639, 0, `    string private _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(640, 0, `    string private _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(641, 0, `    uint8 private _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(642, 0, `    uint256 public _taxFee = ${params["transactionYield"]["N"]};`);
+                        content.splice(645, 0, `    uint256 public _liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                        content.splice(655, 0, `    uint256 public _maxTxAmount = ${params["maxTransactionAmount"]["N"]};`);
+                        content.splice(656, 0, `    uint256 private numTokensSellToAddToLiquidity = ${params["minLiquidityTransactionVolume"]["N"]};`);
+                        content.splice(658, 0, `    uint256 _protocolFee = ${params["marketingFee"]["N"]}; //USAGE FEE FACTOR (For DEV) - ${params["marketingFee"]["N"]}%`);
+                        content.splice(661, 0, `    address payable protocolFeeTaker = payable(${params["marketingWallet"]["S"]}); // Address that gets the protocol fee`);
+                        content.splice(682, 0, `       IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(${params["router"]["S"]});`)
+                        text = content.join("\n");
+                        console.log("text: ", text);
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rewards") {
+                        if (params["transactionYield"]["N"] === "0") {
+                            const Key = 'lg_ro_mw.sol';
                             console.log("point 1");
                             const data = await s3.getObject({ Bucket, Key }).promise();
                             console.log("safemoon: ", JSON.stringify(data));
                             const content = data.Body.toString('ascii').split("\n");
-                            content.splice(634, 0, `    uint256 private _tTotal = ${params["totalSupply"]["N"]};`);
-                            content.splice(639, 0, `    string private _name = \"${params["tokenName"]["S"]}\";`);
-                            content.splice(640, 0, `    string private _symbol = \"${params["tokenSymbol"]["S"]}\";`);
-                            content.splice(641, 0, `    uint8 private _decimals = ${params["decimals"]["N"]};`);
-                            content.splice(642, 0, `    uint256 public _taxFee = ${params["transactionYield"]["N"]};`);
-                            content.splice(645, 0, `    uint256 public _liquidityFee = ${params["transactionLiquidity"]["N"]};`);
-                            content.splice(655, 0, `    uint256 public _maxTxAmount = ${params["maxTransactionAmount"]["N"]};`);
-                            content.splice(656, 0, `    uint256 private numTokensSellToAddToLiquidity = ${params["minLiquidityTransactionVolume"]["N"]};`);
-                            content.splice(658, 0, `    uint256 _protocolFee = ${params["marketingFee"]["N"]}; //USAGE FEE FACTOR (For DEV) - ${params["marketingFee"]["N"]}%`);
-                            content.splice(661, 0, `    address payable protocolFeeTaker = payable(${params["marketingWallet"]["S"]}); // Address that gets the protocol fee`);
-                            content.splice(682, 0, `       IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(${params["router"]["S"]});`)
+                            content.splice(241, 0, `    IBEP20 BUSD = IBEP20(${params["rewardsOtherToken"]["S"]});`);
+                            content.splice(242, 0, `    address WBNB = ${params["routerBaseToken"]["S"]};`);
+                            content.splice(276, 0, `            : IDEXRouter(${params["router"]["S"]});`);
+                            content.splice(396, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
+                            content.splice(400, 0, `    address BUSD = ${params["rewardsOtherToken"]["S"]};`);
+                            content.splice(401, 0, `    address public WBNB = ${params["routerBaseToken"]["S"]};`);
+                            content.splice(406, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                            content.splice(407, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                            content.splice(408, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                            content.splice(410, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
+                            content.splice(420, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                            content.splice(421, 0, `    uint256 reflectionFee = ${params["rewardsOther"]["N"]};`);
+                            content.splice(422, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
+                            content.splice(426, 0, `    uint256 buyMultiplier = ${params["buyMultiplier"]["N"]};`);
+                            content.splice(427, 0, `    uint256 sellMultiplier = ${params["sellMultiplier"]["N"]};`);
+                            content.splice(430, 0, `    address public marketingFeeReceiver = ${params["marketingWallet"]["S"]};`);
+                            content.splice(453, 0, `        address _dexRouter = ${params["router"]["S"]};`);
                             text = content.join("\n");
                             console.log("text: ", text);
-                        } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rewards") {
+                        } else {
                             const Key = 'lg_rn_ro_mw.sol';
                             console.log("point 1");
                             const data = await s3.getObject({ Bucket, Key }).promise();
@@ -63,7 +90,7 @@ module.exports.handler = (event, context) => {
                             content.splice(319, 0, `    IBEP20 BUSD = IBEP20(${params["rewardsOtherToken"]["S"]});`);
                             content.splice(320, 0, `    address WBNB = ${params["routerBaseToken"]["S"]};`);
                             content.splice(355, 0, `            : IDEXRouter(${params["router"]["S"]});`);
-                            content.splice(515, 0, `contract ${params["tokenName"]["S"]} is IBEP20, Auth {`);
+                            content.splice(515, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
                             content.splice(519, 0, `    address BUSD = ${params["rewardsOtherToken"]["S"]};`);
                             content.splice(520, 0, `    address public WBNB = ${params["routerBaseToken"]["S"]};`);
                             content.splice(525, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
@@ -80,67 +107,89 @@ module.exports.handler = (event, context) => {
                             content.splice(589, 0, `        address _dexRouter = ${params["router"]["S"]};`);
                             text = content.join("\n");
                             console.log("text: ", text);
-                        } else {
-                            const Key = 'standard_mw.sol';
-                            console.log("point 1");
-                            const data = await s3.getObject({ Bucket, Key }).promise();
-                            console.log("standard: ", JSON.stringify(data));
-                            const content = data.Body.toString('ascii').split("\n");
-                            content.splice(568, 0, `    uint256 initialSupply_ = ${params["totalSupply"]["N"]};`);
-                            content.splice(569, 0, `    string name_ = \"${params["tokenName"]["S"]}\";`);
-                            content.splice(570, 0, `    string symbol_ = \"${params["tokenSymbol"]["S"]}\";`);
-                            content.splice(571, 0, `    uint8 decimals_ = ${params["decimals"]["N"]};`);
-                            content.splice(573, 0, `    uint256 _protocolFee = ${params["marketingFee"]["N"]}; //USAGE FEE FACTOR (For DEV) - ${params["marketingFee"]["N"]}%`);
-                            content.splice(577, 0, `    address payable protocolFeeTaker = payable(${params["marketingWallet"]["S"]}); // Address that gets the protocol fee`);
-                            text = content.join("\n");
-                            console.log("text: ", text);
                         }
-                        
-                        try {
-                            console.log("text2: ", text);
-                            updateRequestTableGenerated(id);
-                            const upload_params = {
-                                Bucket: GENERATED_BUCKET_NAME,
-                                Key: `${id}.sol`,
-                                Body: text,
-                            };
-                            const upload_data = await s3.upload(upload_params).promise();
-                            console.log('upload data:', JSON.stringify(upload_data));
-                            const subscribers = await db.fetchContractRequestSubscriptions(id);
-                            console.log('subscribers: ', JSON.stringify(subscribers));
-                            const results = subscribers.map(subscriber => {
-                                const subscriberId = db.parseEntityId(
-                                    subscriber[db.ContractRequest.Connections.Range]
-                                );
-                                console.log('subscriber: ', subscriber);
-                                try {
-                                return wsClient.send(subscriberId, {
-                                    event: "contract_generated",
-                                    requestId: id,
-                                });
-                                } catch(err){
-                                    console.log(err);
-                                }
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rising Floor") {
+                        const Key = 'lg_rBNB_mw_ap.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(338, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
+                        content.splice(342, 0, `    address WBNB = ${params["routerBaseToken"]["S"]};`);
+                        content.splice(347, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(348, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(349, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(351, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
+                        content.splice(362, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                        content.splice(364, 0, `    uint256 reflectionFee = ${params["rewardsBase"]["N"]};`);
+                        content.splice(366, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
+                        content.splice(372, 0, `    uint256 buyMultiplier = ${params["buyMultiplier"]["N"]};`);
+                        content.splice(373, 0, `    uint256 sellMultiplier = ${params["sellMultiplier"]["N"]};`);
+                        content.splice(376, 0, `    address public marketingFeeReceiver = ${params["marketingWallet"]["S"]};`);
+                        content.splice(401, 0, `        address _dexRouter = ${params["router"]["S"]};`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
+                    } else {
+                        const Key = 'standard_mw.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("standard: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(568, 0, `    uint256 initialSupply_ = ${params["totalSupply"]["N"]};`);
+                        content.splice(569, 0, `    string name_ = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(570, 0, `    string symbol_ = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(571, 0, `    uint8 decimals_ = ${params["decimals"]["N"]};`);
+                        content.splice(573, 0, `    uint256 _protocolFee = ${params["marketingFee"]["N"]}; //USAGE FEE FACTOR (For DEV) - ${params["marketingFee"]["N"]}%`);
+                        content.splice(577, 0, `    address payable protocolFeeTaker = payable(${params["marketingWallet"]["S"]}); // Address that gets the protocol fee`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
+                    }
+                    
+                    try {
+                        console.log("text2: ", text);
+                        updateRequestTableGenerated(id);
+                        const upload_params = {
+                            Bucket: GENERATED_BUCKET_NAME,
+                            Key: `${id}.sol`,
+                            Body: text,
+                        };
+                        const upload_data = await s3.upload(upload_params).promise();
+                        console.log('upload data:', JSON.stringify(upload_data));
+                        const subscribers = await db.fetchContractRequestSubscriptions(id);
+                        console.log('subscribers: ', JSON.stringify(subscribers));
+                        const results = subscribers.map(subscriber => {
+                            const subscriberId = db.parseEntityId(
+                                subscriber[db.ContractRequest.Connections.Range]
+                            );
+                            console.log('subscriber: ', subscriber);
+                            try {
+                            return wsClient.send(subscriberId, {
+                                event: "contract_generated",
+                                requestId: id,
                             });
+                            } catch(err){
+                                console.log(err);
+                            }
+                        });
 
-                            const message = JSON.stringify({
-                                'id': id,
-                                'chain': chain,
-                                'type': record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'],
-                                'name': params["tokenName"]["S"]
-                            });
-                            const metadata = await publishSnsTopic(message).promise();
-                            console.log('metadata: ', JSON.stringify(metadata));
-                            await Promise.all(results);
-                            
-                            return {
-                                headers,
-                                statusCode: 200,
-                                body: JSON.stringify(metadata),
-                            };
-                        } catch (err) {
-                            return(err);
-                        }
+                        const message = JSON.stringify({
+                            'id': id,
+                            'chain': chain,
+                            'type': record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'],
+                            'name': params["tokenName"]["S"]
+                        });
+                        const metadata = await publishSnsTopic(message).promise();
+                        console.log('metadata: ', JSON.stringify(metadata));
+                        await Promise.all(results);
+                        
+                        return {
+                            headers,
+                            statusCode: 200,
+                            body: JSON.stringify(metadata),
+                        };
+                    } catch (err) {
+                        return(err);
+                    }
                     
                 } catch (err) {
                     console.log(err, err.stack);
