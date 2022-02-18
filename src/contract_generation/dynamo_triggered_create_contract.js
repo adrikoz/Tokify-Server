@@ -127,6 +127,28 @@ module.exports.handler = (event, context) => {
                         content.splice(522, 0, `        marketingFeeReceiver = ${params["marketingWallet"]["S"]};`);
                         text = content.join("\n");
                         console.log("text: ", text);
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "AltCrusaders") {
+                        const Key = 'altcrusaders.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(221, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
+                        content.splice(226, 0, `    address public WBNB = ${params["routerBaseToken"]["S"]};`);
+                        content.splice(230, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(231, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(232, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(234, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
+                        content.splice(245, 0, `    uint256 buyLiquidityFee = ${params["buyLiquidityFee"]["N"]};`);
+                        content.splice(246, 0, `    uint256 buyMarketingFee = ${params["buyMarketingFee"]["N"]};`);
+                        content.splice(247, 0, `    uint256 buyDeveloperFee = ${params["buyDeveloperFee"]["N"]};`);
+                        content.splice(248, 0, `    uint256 buyTeamFee = ${params["buyTeamFee"]["N"]};`);
+                        content.splice(251, 0, `    uint256 sellLiquidityFee = ${params["sellLiquidityFee"]["N"]};`);
+                        content.splice(252, 0, `    uint256 sellMarketingFee = ${params["sellMarketingFee"]["N"]};`);
+                        content.splice(253, 0, `    uint256 sellDeveloperFee = ${params["sellDeveloperFee"]["N"]};`);
+                        content.splice(254, 0, `    uint256 sellTeamFee = ${params["sellTeamFee"]["N"]};`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
                     } else {
                         const Key = 'standard_mw.sol';
                         console.log("point 1");

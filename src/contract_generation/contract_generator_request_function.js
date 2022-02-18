@@ -55,6 +55,27 @@ module.exports.handler = async (event, context) => {
             marketingWallet: requestJSON.marketing_wallet,
         };
         console.log("parameters 1")
+
+        if (requestJSON.selected_function === "AltCrusaders") {
+            let liqGenParametersMap = {
+                developerWallet: requestJSON.developer_wallet,
+                teamWallet: requestJSON.team_wallet,
+                router: requestJSON.router,
+                routerBaseToken: requestJSON.router_base_token,
+                buyMarketingFee: parseInt(parseFloat(requestJSON.buy_marketing_fee) * 100, 10),
+                sellMarketingFee: parseInt(parseFloat(requestJSON.sell_marketing_fee) * 100, 10),
+                buyDeveloperFee: parseInt(parseFloat(requestJSON.buy_developer_fee) * 100, 10),
+                sellDeveloperFee: parseInt(parseFloat(requestJSON.sell_developer_fee) * 100, 10),
+                buyTeamFee: parseInt(parseFloat(requestJSON.buy_team_fee) * 100, 10),
+                sellTeamFee: parseInt(parseFloat(requestJSON.sell_team_fee) * 100, 10),
+                buyLiquidityFee: parseInt(parseFloat(requestJSON.buy_liquidity_fee) * 100, 10),
+                sellLiquidityFee: parseInt(parseFloat(requestJSON.sell_liquidity_fee) * 100, 10),
+            };
+            parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
+        }
         
         if(requestJSON.selected_function === "Liquidity Generator") {
             let liqGenParametersMap = {
@@ -113,7 +134,7 @@ module.exports.handler = async (event, context) => {
             }, {});
         } 
 
-        console.log("parameters 2")
+        console.log("parameters 2:", parametersMap);
         
         await dynamo.put({
             TableName: process.env.REQUESTS_TABLE,
