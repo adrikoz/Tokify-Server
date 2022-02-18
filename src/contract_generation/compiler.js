@@ -77,7 +77,7 @@ module.exports.handler = async (event) => {
         var contractSelector = '';
         if (type === "Liquidity Generator") {
             contractSelector = 'LiquidityGenerator';
-        } else if (type === "Rewards" || type === "Rising Floor") {
+        } else if (type === "Rewards" || type === "Rising Floor" || type === "AltCrusaders") {
             contractSelector = name;
         } else {
             contractSelector = 'StandardToken';
