@@ -126,7 +126,9 @@ module.exports.handler = async (event, context) => {
                 router: requestJSON.router,
                 routerBaseToken: requestJSON.router_base_token,
                 transactionLiquidity: parseInt(parseFloat(requestJSON.transaction_liquidity) * 100, 10),
-                rewardsBase: parseInt(parseFloat(requestJSON.rewards_base) * 100, 10),
+                rewardsOther: parseInt(parseFloat(requestJSON.rewards_other) * 100, 10),
+                rewardsOtherToken: requestJSON.rewards_other_token,
+                backingFee: parseInt(parseFloat(requestJSON.backing_fee) * 100, 10),
             };
                 parametersMap = [parametersMap, risingFloorParametersMap].reduce(function (r, o) {
                 Object.keys(o).forEach(function (k) { r[k] = o[k]; });
