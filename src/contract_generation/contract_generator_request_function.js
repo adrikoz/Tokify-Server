@@ -120,7 +120,7 @@ module.exports.handler = async (event, context) => {
             }, {});
         } 
 
-        if(requestJSON.selected_function === "Rising Floor") {
+        if(requestJSON.selected_function === "Testudo") {
             let risingFloorParametersMap = {
                 marketingFee: parseInt(parseFloat(requestJSON.marketing_fee) * 100, 10),
                 router: requestJSON.router,
@@ -134,7 +134,7 @@ module.exports.handler = async (event, context) => {
                 Object.keys(o).forEach(function (k) { r[k] = o[k]; });
                 return r;
             }, {});
-        } 
+        }
 
         console.log("parameters 2:", parametersMap);
         
