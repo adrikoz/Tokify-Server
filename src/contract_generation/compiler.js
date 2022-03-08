@@ -62,9 +62,32 @@ module.exports.handler = async (event) => {
         console.log("point 2a");
         //const solcVersioned = solc.useVersion('v0.6.12+commit.27d51765');
         //const string_output = solc.compile(input_string);
-        const string_output = solc.compile(input_string);
-        console.log('output: ', string_output)
-        await processCompilerOutput(string_output);
+        if (type === 'Rebase') {
+            await new Promise((resolve, reject) => {
+                solc.loadRemoteVersion('v0.7.4+commit.3f05b770', async function (err, solcSnapshot) {
+                    if (err) {
+                        console.log('erroring in the callback');
+                        resolve();
+                        // An error was encountered, display and quit
+                    } else {
+                        console.log('chilling inside the callback');
+                        try {
+                            const string_output = solcSnapshot.compile(input_string);
+                            console.log('output: ', string_output)
+                            await processCompilerOutput(string_output);
+                            resolve();
+                        } catch (err) {
+                            console.log(err);
+                            resolve();
+                        }
+                    }
+                });
+            });
+        } else {
+            const string_output = solc.compile(input_string);
+            console.log('output: ', string_output)
+            await processCompilerOutput(string_output);
+        }
     } catch (err) {
         console.log(err, err.stack);
         return(err);
@@ -77,7 +100,7 @@ module.exports.handler = async (event) => {
         var contractSelector = '';
         if (type === "Liquidity Generator") {
             contractSelector = 'LiquidityGenerator';
-        } else if (type === "Rewards" || type === "Testudo" || type === "AltCrusaders") {
+        } else if (type === "Rewards" || type === "Testudo" || type === "AltCrusaders" || type === "Rebase") {
             contractSelector = name;
         } else {
             contractSelector = 'StandardToken';

@@ -136,6 +136,19 @@ module.exports.handler = async (event, context) => {
             }, {});
         }
 
+        if(requestJSON.selected_function === "Rebase") {
+            let liqGenParametersMap = {
+                marketingFee: parseInt(parseFloat(requestJSON.marketing_fee) * 100, 10),
+                transactionLiquidity: parseInt(parseFloat(requestJSON.transaction_liquidity) * 100, 10),
+                riskFreeValue: parseInt(parseFloat(requestJSON.risk_free_value) * 100, 10),
+                sellFee: parseInt(parseFloat(requestJSON.sell_fee) * 100, 10),
+            };
+            parametersMap = [parametersMap, liqGenParametersMap].reduce(function (r, o) {
+                Object.keys(o).forEach(function (k) { r[k] = o[k]; });
+                return r;
+            }, {});
+        } 
+
         console.log("parameters 2:", parametersMap);
         
         await dynamo.put({

@@ -121,7 +121,7 @@ module.exports.handler = (event, context) => {
                         content.splice(394, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
                         content.splice(395, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
                         content.splice(396, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
-                        content.splice(399, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
+                        content.splice(398, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
                         content.splice(410, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
                         content.splice(412, 0, `    uint256 rewardsFee = ${params["rewardsOther"]["N"]};`);
                         content.splice(414, 0, `    uint256 backingFee = ${params["backingFee"]["N"]};`);
@@ -148,6 +148,23 @@ module.exports.handler = (event, context) => {
                         content.splice(178, 0, `    uint256 sellMarketingFee = ${params["sellMarketingFee"]["N"]};`);
                         content.splice(179, 0, `    uint256 sellDeveloperFee = ${params["sellDeveloperFee"]["N"]};`);
                         content.splice(180, 0, `    uint256 sellTeamFee = ${params["sellTeamFee"]["N"]};`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rebase") {
+                        const Key = 'rebase.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(333, 0, `contract ${nameNoSpace} is ERC20Detailed, Ownable, MinterRole {`);
+                        content.splice(360, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(361, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(362, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(365, 0, `    uint256 private constant INITIAL_FRAGMENTS_SUPPLY = ${params["totalSupply"]["N"]};`);
+                        content.splice(367, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                        content.splice(368, 0, `    uint256 Treasury = ${params["marketingFee"]["N"]};`);
+                        content.splice(369, 0, `    uint256 RiskFreeValue = ${params["riskFreeValue"]["N"]};`);
+                        content.splice(370, 0, `    uint256 sellFee = ${params["sellFee"]["N"]};`);
                         text = content.join("\n");
                         console.log("text: ", text);
                     } else {
