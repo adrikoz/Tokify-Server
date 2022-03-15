@@ -167,6 +167,25 @@ module.exports.handler = (event, context) => {
                         content.splice(370, 0, `    uint256 sellFee = ${params["sellFee"]["N"]};`);
                         text = content.join("\n");
                         console.log("text: ", text);
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Lottery") {
+                        const Key = 'lottery.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(397, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
+                        content.splice(400, 0, `    address public WBNB = ${params["routerBaseToken"]["S"]};`);
+                        content.splice(404, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(405, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(406, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(409, 0, `    uint256 private _tTotal = ${params["totalSupply"]["N"]};`);
+                        content.splice(423, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                        content.splice(424, 0, `    uint256 lotteryFee = ${params["lotteryFee"]["N"]};`);
+                        content.splice(425, 0, `    uint256 reflectionFee = ${params["transactionYield"]["N"]};`);
+                        content.splice(426, 0, `    uint256 ecosystemFee = ${params["marketingFee"]["N"]};`);
+                        content.splice(427, 0, `    uint256 burnFee = ${params["burnFee"]["N"]};`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
                     } else {
                         const Key = 'standard_mw.sol';
                         console.log("point 1");
