@@ -128,6 +128,23 @@ module.exports.handler = (event, context) => {
                         content.splice(416, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
                         text = content.join("\n");
                         console.log("text: ", text);
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rising Floor") {
+                        const Key = 'rising_floor_no_rewards.sol';
+                        console.log("point 1");
+                        const data = await s3.getObject({ Bucket, Key }).promise();
+                        console.log("safemoon: ", JSON.stringify(data));
+                        const content = data.Body.toString('ascii').split("\n");
+                        content.splice(155, 0, `contract ${nameNoSpace} is IBEP20, Auth {`);
+                        content.splice(159, 0, `    address WBNB = ${params["routerBaseToken"]["S"]};`);
+                        content.splice(164, 0, `    string constant _name = \"${params["tokenName"]["S"]}\";`);
+                        content.splice(165, 0, `    string constant _symbol = \"${params["tokenSymbol"]["S"]}\";`);
+                        content.splice(166, 0, `    uint8 constant _decimals = ${params["decimals"]["N"]};`);
+                        content.splice(168, 0, `    uint256 private _totalSupply = ${params["totalSupply"]["N"]};`);
+                        content.splice(180, 0, `    uint256 liquidityFee = ${params["transactionLiquidity"]["N"]};`);
+                        content.splice(182, 0, `    uint256 backingFee = ${params["backingFee"]["N"]};`);
+                        content.splice(184, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
+                        text = content.join("\n");
+                        console.log("text: ", text);
                     } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "AltCrusaders") {
                         const Key = 'altcrusaders.sol';
                         console.log("point 1");
