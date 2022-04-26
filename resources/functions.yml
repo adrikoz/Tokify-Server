@@ -87,3 +87,11 @@ RetrieveUserContracts:
         path: usercontracts
         method: get
         cors: true
+
+Snapshot:
+  handler: src/snapshot/snapshot.handler
+  events:
+    - http:
+        path: snapshot
+        method: get
+        cors: true
