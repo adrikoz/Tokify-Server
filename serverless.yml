@@ -18,7 +18,7 @@ custom:
   templateContractBucketName: ${self:provider.stage}-template-contracts
   generatedContractBucketName: ${self:provider.stage}-generated-contracts
   compiledContractBucketName: ${self:provider.stage}-compiled-contracts
-  snapshotBucketName: ${self:provider.stage}-snapshot
+  snapshotBucketName: ${self:provider.stage}-token-snapshot
   contractGeneratedStream:
     dev: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/dev-contract-generator-requests/stream/2021-12-17T18:40:15.064
     prod: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/prod-contract-generator-requests/stream/2021-12-17T19:12:26.719
