@@ -90,6 +90,7 @@ RetrieveUserContracts:
 
 Snapshot:
   handler: src/snapshot/snapshot.handler
+  timeout: 900
   events:
     - http:
         path: snapshot

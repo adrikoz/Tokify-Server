@@ -5,6 +5,7 @@
   "httpMethod": "GET",
   "queryStringParameters": {
     "address": "0xdfAA1f2Ba4550a3f099ca26ac73e4E4F27Cf5CA3",
-    "chainId": "56"
+    "chainId": "56",
+    "newTokenPerOld": 1
   }
 }
