@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0",
     "axios": "^0.27.1",
     "csv-writer": "^1.6.0",
     "fs": "^0.0.1-security",
