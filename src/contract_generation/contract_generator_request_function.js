@@ -44,7 +44,7 @@ module.exports.handler = async (event, context) => {
         }
 
         var decimals = parseInt(requestJSON.decimals, 10)
-        var totalSupply = parseInt(requestJSON.total_supply, 10) * 10 ** decimals;
+        var totalSupply = parseInt(requestJSON.total_supply, 10);
 
         let parametersMap = {
             tokenName: requestJSON.token_name,
