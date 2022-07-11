@@ -56,7 +56,7 @@ module.exports.handler = async (event, context) => {
         };
         console.log("parameters 1")
 
-        if (requestJSON.selected_function === "AltCrusaders") {
+        if (requestJSON.selected_function === "Liquidity Generator") {
             let liqGenParametersMap = {
                 developerWallet: requestJSON.developer_wallet,
                 teamWallet: requestJSON.team_wallet,
@@ -77,7 +77,7 @@ module.exports.handler = async (event, context) => {
             }, {});
         }
         
-        if(requestJSON.selected_function === "Liquidity Generator") {
+        /*if(requestJSON.selected_function === "Liquidity Generator") {
             let liqGenParametersMap = {
                 marketingFee: parseInt(requestJSON.marketing_fee, 10),
                 router: requestJSON.router,
@@ -90,7 +90,7 @@ module.exports.handler = async (event, context) => {
                 Object.keys(o).forEach(function (k) { r[k] = o[k]; });
                 return r;
             }, {});
-        } 
+        }*/
 
         if(requestJSON.selected_function === "Standard") {
             let standardParametersMap = {

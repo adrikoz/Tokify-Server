@@ -36,7 +36,7 @@ module.exports.handler = (event, context) => {
                     console.log(TEMPLATE_BUCKET_NAME);
                     const Bucket = TEMPLATE_BUCKET_NAME;
                     var text = "";
-                    if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator"){
+                    /*if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator"){
                         const Key = 'liquidity_generator_mw.sol';
                         console.log("point 1");
                         const data = await s3.getObject({ Bucket, Key }).promise();
@@ -55,7 +55,7 @@ module.exports.handler = (event, context) => {
                         content.splice(682, 0, `       IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(${params["router"]["S"]});`)
                         text = content.join("\n");
                         console.log("text: ", text);
-                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rewards") {
+                    } else */if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Rewards") {
                         if (params["transactionYield"]["N"] === "0") {
                             const Key = 'lg_ro_mw.sol';
                             console.log("point 1");
@@ -145,7 +145,7 @@ module.exports.handler = (event, context) => {
                         content.splice(184, 0, `    uint256 marketingFee = ${params["marketingFee"]["N"]};`);
                         text = content.join("\n");
                         console.log("text: ", text);
-                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "AltCrusaders") {
+                    } else if (record['dynamodb']['NewImage']['parameters']['M']['selectedFunctions']['S'] === "Liquidity Generator") {
                         const Key = 'altcrusaders.sol';
                         console.log("point 1");
                         const data = await s3.getObject({ Bucket, Key }).promise();

@@ -98,9 +98,9 @@ module.exports.handler = async (event) => {
         var output = JSON.parse(string_output);
         console.log("point 3");
         var contractSelector = '';
-        if (type === "Liquidity Generator") {
+        /*if (type === "Liquidity Generator") {
             contractSelector = 'LiquidityGenerator';
-        } else if (type === "Rewards" || type === "Testudo" || type === "Rising Floor" || type === "AltCrusaders" || type === "Rebase" || type === "Lottery") {
+        } else */if (type === "Rewards" || type === "Testudo" || type === "Rising Floor" || type === "Liquidity Generator" || type === "Rebase" || type === "Lottery") {
             contractSelector = name;
         } else {
             contractSelector = 'StandardToken';
